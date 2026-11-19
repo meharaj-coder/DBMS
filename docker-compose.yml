@@ -1,0 +1,31 @@
+# PostgreSQL and Neo4j for local development.
+services:
+  postgres:
+    image: postgres:17
+    container_name: hms-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_dev
+      POSTGRES_DB: hospital
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - hms_pgdata:/var/lib/postgresql/data
+      - ./database/postgres:/docker-entrypoint-initdb.d:ro   # runs once, in name order
+      - ./database/queries:/queries:ro
+
+  neo4j:
+    image: neo4j:5
+    container_name: hms-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/hms_graph_dev
+    ports:
+      - "127.0.0.1:7474:7474"   # Neo4j Browser
+      - "127.0.0.1:7687:7687"   # Bolt
+    volumes:
+      - hms_neo4jdata:/data
+      - ./database/neo4j:/cypher:ro
+
+volumes:
+  hms_pgdata:
+  hms_neo4jdata:
